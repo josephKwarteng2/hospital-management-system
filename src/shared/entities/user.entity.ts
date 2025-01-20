@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Role, Status } from '../types/types';
 
 @Entity('users')
 export class User {
@@ -23,11 +24,11 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ type: 'enum', enum: ['admin', 'doctor', 'patient'] })
-  role: 'admin' | 'doctor' | 'patient';
+  @Column({ type: 'enum', enum: Role })
+  role: Role;
 
-  @Column({ default: true })
-  status: boolean;
+  @Column({ type: 'enum', enum: Status, default: Status.Active })
+  status: Status;
 
   @CreateDateColumn()
   createdAt: Date;

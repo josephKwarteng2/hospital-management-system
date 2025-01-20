@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Status } from '../types/types';
 
 @Entity('services')
 export class Service {
@@ -17,8 +18,8 @@ export class Service {
   @Column({ default: 0 })
   doctorCount: number;
 
-  @Column({ default: true })
-  status: boolean;
+  @Column({ type: 'enum', enum: Status, default: Status.Active })
+  status: Status;
 
   @CreateDateColumn()
   createdAt: Date;

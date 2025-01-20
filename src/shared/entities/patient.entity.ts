@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../../shared/entities/user.entity';
+import { Gender } from '../types/types';
 
 @Entity('patients')
 export class Patient {
@@ -16,8 +17,8 @@ export class Patient {
   @JoinColumn()
   user: User;
 
-  @Column({ type: 'enum', enum: ['male', 'female', 'other'] })
-  gender: 'male' | 'female' | 'other';
+  @Column({ type: 'enum', enum: Gender })
+  gender: Gender;
 
   @Column({ length: 15 })
   contact: string;
