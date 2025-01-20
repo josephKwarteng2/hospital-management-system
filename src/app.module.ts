@@ -9,6 +9,7 @@ import { MailController } from './shared/mailer/mailer.controller';
 import { MailService } from './shared/mailer/mailer.service';
 import { configService } from './config/config.service';
 import { SeedModule } from './shared/seed/seed.module';
+import { Invitation } from './shared/entities/invitations.entity';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { SeedModule } from './shared/seed/seed.module';
       isGlobal: true,
     }),
     TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
+    TypeOrmModule.forFeature([Invitation]),
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
