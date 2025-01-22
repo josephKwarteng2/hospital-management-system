@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
 } from 'typeorm';
+import { Role } from '../types/types';
 
 @Entity('invitations')
 export class Invitation {
@@ -21,6 +22,15 @@ export class Invitation {
 
   @Column()
   token: string;
+
+  @Column({
+    type: 'enum',
+    enum: Role,
+  })
+  role: Role;
+
+  @Column({ nullable: false })
+  defaultPassword: string;
 
   @CreateDateColumn()
   createdAt: Date;
