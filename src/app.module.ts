@@ -3,13 +3,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { AuthModule } from './auth/auth.module';
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { MailController } from './shared/mailer/mailer.controller';
-import { MailService } from './shared/mailer/mailer.service';
 import { configService } from './config/config.service';
 import { SeedModule } from './shared/seed/seed.module';
 import { Invitation } from './shared/entities/invitations.entity';
+import { InvitationModule } from './invitation/invitation.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -35,8 +34,9 @@ import { Invitation } from './shared/entities/invitations.entity';
     }),
     AuthModule,
     SeedModule,
+    InvitationModule,
   ],
-  controllers: [AppController, MailController],
-  providers: [AppService, MailService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
