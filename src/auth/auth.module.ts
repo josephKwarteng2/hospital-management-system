@@ -13,6 +13,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailService } from '../shared/services/mail/mail.service';
 import { AppModule } from 'src/app.module';
+import { ProfileCreatorFactory } from './profile-creators/profile-creator.factory';
+import { DoctorProfileCreator } from './profile-creators/creators/doctor-profile.creator';
+import { PatientProfileCreator } from './profile-creators/creators/patient-profile.creator';
 
 @Module({
   imports: [
@@ -43,6 +46,9 @@ import { AppModule } from 'src/app.module';
     EmailService,
     UserRepository,
     TokenService,
+    ProfileCreatorFactory,
+    DoctorProfileCreator,
+    PatientProfileCreator,
     {
       provide: 'JWT_SECRET',
       useValue: process.env.JWT_SECRET,

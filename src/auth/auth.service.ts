@@ -4,32 +4,27 @@ import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TOAST_MSGS } from 'src/shared/constants/constants';
-import { Gender, Role } from 'src/shared/types/types';
 import { Invitation } from 'src/shared/entities/invitations.entity';
 import { UserRegistrationDto } from './dto/user-registration.dto';
 import { InvitationDto } from './dto/invitation.dto';
 import { User } from 'src/shared/entities/user.entity';
-import { Patient } from 'src/shared/entities/patient.entity';
-import { Doctor } from 'src/shared/entities/doctor.entity';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { AuthenticationError } from 'src/shared/common/filters/http-exception.filter';
 import { EmailService } from 'src/shared/services/mail/mail.service';
 import { TokenService } from 'src/shared/services/token/token.service';
 import { mailConfig } from 'src/config/mail.config';
+import { ProfileCreatorFactory } from './profile-creators/profile-creator.factory';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly emailService: EmailService,
     private readonly tokenService: TokenService,
+    private readonly profileCreatorFactory: ProfileCreatorFactory,
     @InjectRepository(Invitation)
     private readonly invitationRepository: Repository<Invitation>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @InjectRepository(Patient)
-    private readonly patientRepository: Repository<Patient>,
-    @InjectRepository(Doctor)
-    private readonly doctorRepository: Repository<Doctor>,
   ) {}
 
   public async sendInvitation(userDetails: InvitationDto): Promise<string> {
@@ -240,58 +235,10 @@ export class AuthService {
     registerDto: UserRegistrationDto,
     user: User,
   ): Promise<void> {
-    switch (registerDto.role) {
-      case Role.Doctor:
-        await this.createDoctorProfile(registerDto, user);
-        break;
-      case Role.Patient:
-        await this.createPatientProfile(registerDto, user);
-        break;
-      default:
-        throw new AuthenticationError(TOAST_MSGS.INVALID_ROLE, 'INVALID_ROLE');
-    }
-  }
-
-  private async createDoctorProfile(
-    registerDto: UserRegistrationDto,
-    user: User,
-  ): Promise<void> {
-    if (!registerDto.specialization || !registerDto.rank) {
-      throw new AuthenticationError(
-        TOAST_MSGS.DOCTOR_DETAILS_REQUIRED,
-        'MISSING_DOCTOR_DETAILS',
-      );
-    }
-
-    const doctor = this.doctorRepository.create({
-      user,
-      specialization: registerDto.specialization,
-      rank: registerDto.rank,
-      workingHours: { startTime: '08:00', endTime: '17:00' },
-    });
-
-    await this.doctorRepository.save(doctor);
-  }
-
-  private async createPatientProfile(
-    registerDto: UserRegistrationDto,
-    user: User,
-  ): Promise<void> {
-    if (!registerDto.gender || !registerDto.contact || !registerDto.address) {
-      throw new AuthenticationError(
-        TOAST_MSGS.PATIENTS_DETAILS_REQUIRED,
-        'MISSING_PATIENT_DETAILS',
-      );
-    }
-
-    const patient = this.patientRepository.create({
-      user,
-      gender: registerDto.gender as Gender,
-      contact: registerDto.contact,
-      address: registerDto.address,
-    });
-
-    await this.patientRepository.save(patient);
+    const profileCreator = this.profileCreatorFactory.getCreator(
+      registerDto.role,
+    );
+    await profileCreator.createProfile(registerDto, user);
   }
 
   private sanitizeUser(user: User): Partial<User> {

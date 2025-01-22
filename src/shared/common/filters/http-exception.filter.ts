@@ -49,11 +49,58 @@ export class AuthenticationError extends HttpException {
   constructor(message: string, description: string) {
     super(
       {
+        statusCode: HttpStatus.UNAUTHORIZED,
+        message,
+        description,
+        errorType: 'AuthenticationError',
+      },
+      HttpStatus.UNAUTHORIZED,
+    );
+  }
+}
+
+export class ValidationError extends HttpException {
+  constructor(message: string, description: string) {
+    super(
+      {
         statusCode: HttpStatus.BAD_REQUEST,
         message,
         description,
+        errorType: 'ValidationError',
       },
       HttpStatus.BAD_REQUEST,
     );
+  }
+}
+
+// Optional: Add base error class to reduce duplication
+abstract class BaseError extends HttpException {
+  constructor(
+    message: string,
+    description: string,
+    status: HttpStatus,
+    errorType: string,
+  ) {
+    super(
+      {
+        statusCode: status,
+        message,
+        description,
+        errorType,
+      },
+      status,
+    );
+  }
+}
+
+export class NotFoundError extends BaseError {
+  constructor(message: string, description: string) {
+    super(message, description, HttpStatus.NOT_FOUND, 'NotFoundError');
+  }
+}
+
+export class ForbiddenError extends BaseError {
+  constructor(message: string, description: string) {
+    super(message, description, HttpStatus.FORBIDDEN, 'ForbiddenError');
   }
 }
