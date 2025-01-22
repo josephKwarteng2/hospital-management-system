@@ -10,32 +10,34 @@ export class PasswordPolicy {
   private readonly REQUIRES_SPECIAL = true;
 
   public async validate(password: string): Promise<void> {
-    const errors: string[] = [];
+    const rules = [
+      {
+        condition: () => password.length < this.MIN_LENGTH,
+        message: `Password must be at least ${this.MIN_LENGTH} characters long.`,
+      },
+      {
+        condition: () => this.REQUIRES_UPPERCASE && !/[A-Z]/.test(password),
+        message: 'Password must contain at least one uppercase letter.',
+      },
+      {
+        condition: () => this.REQUIRES_LOWERCASE && !/[a-z]/.test(password),
+        message: 'Password must contain at least one lowercase letter.',
+      },
+      {
+        condition: () => this.REQUIRES_NUMBER && !/\d/.test(password),
+        message: 'Password must contain at least one number.',
+      },
+      {
+        condition: () =>
+          this.REQUIRES_SPECIAL && !/[!@#$%^&*(),.?":{}|<>]/.test(password),
+        message: 'Password must contain at least one special character.',
+      },
+    ];
 
-    if (password.length < this.MIN_LENGTH) {
-      errors.push(
-        `Password must be at least ${this.MIN_LENGTH} characters long`,
-      );
-    }
-
-    if (this.REQUIRES_UPPERCASE && !/[A-Z]/.test(password)) {
-      errors.push('Password must contain at least one uppercase letter');
-    }
-
-    if (this.REQUIRES_LOWERCASE && !/[a-z]/.test(password)) {
-      errors.push('Password must contain at least one lowercase letter');
-    }
-
-    if (this.REQUIRES_NUMBER && !/\d/.test(password)) {
-      errors.push('Password must contain at least one number');
-    }
-
-    if (this.REQUIRES_SPECIAL && !/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-      errors.push('Password must contain at least one special character');
-    }
-
-    if (errors.length > 0) {
-      throw new ValidationError(errors.join('. '), 'INVALID_PASSWORD');
+    for (const rule of rules) {
+      if (rule.condition()) {
+        throw new ValidationError(rule.message, 'INVALID_PASSWORD');
+      }
     }
   }
 }

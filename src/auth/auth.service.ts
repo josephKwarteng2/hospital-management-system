@@ -14,12 +14,14 @@ import { EmailService } from 'src/shared/services/mail/mail.service';
 import { TokenService } from 'src/shared/services/token/token.service';
 import { mailConfig } from 'src/config/mail.config';
 import { ProfileCreatorFactory } from './profile-creators/profile-creator.factory';
+import { PasswordPolicy } from 'src/shared/validator/password-policy';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly emailService: EmailService,
     private readonly tokenService: TokenService,
+    private readonly passwordPolicy: PasswordPolicy,
     private readonly profileCreatorFactory: ProfileCreatorFactory,
     @InjectRepository(Invitation)
     private readonly invitationRepository: Repository<Invitation>,
@@ -83,6 +85,8 @@ export class AuthService {
   ): Promise<string> {
     const decodedToken = this.tokenService.verifyToken<InvitationDto>(token);
     const invitation = await this.validateInvitation(decodedToken.email);
+
+    await this.passwordPolicy.validate(changePasswordDto.newPassword);
 
     const hashedPassword = await bcrypt.hash(changePasswordDto.newPassword, 10);
     invitation.defaultPassword = hashedPassword;

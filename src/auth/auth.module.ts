@@ -16,6 +16,7 @@ import { AppModule } from 'src/app.module';
 import { ProfileCreatorFactory } from './profile-creators/profile-creator.factory';
 import { DoctorProfileCreator } from './profile-creators/creators/doctor-profile.creator';
 import { PatientProfileCreator } from './profile-creators/creators/patient-profile.creator';
+import { PasswordPolicy } from 'src/shared/validator/password-policy';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { PatientProfileCreator } from './profile-creators/creators/patient-profi
     ProfileCreatorFactory,
     DoctorProfileCreator,
     PatientProfileCreator,
+    PasswordPolicy,
     {
       provide: 'JWT_SECRET',
       useValue: process.env.JWT_SECRET,
