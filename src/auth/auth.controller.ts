@@ -3,6 +3,8 @@ import { AuthService } from './auth.service';
 import { UserRegistrationDto } from './dto/user-registration.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { InvitationDto } from './dto/invitation.dto';
+import { LoginDto } from './dto/login.dto';
+import { User } from 'src/shared/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -11,6 +13,13 @@ export class AuthController {
   @Post('send-invitation')
   async sendInvitation(@Body() sendInvitationDto: InvitationDto) {
     return this.authService.sendInvitation(sendInvitationDto);
+  }
+
+  @Post('login')
+  public async login(
+    @Body() loginDto: LoginDto,
+  ): Promise<{ token: string; user: Partial<User> }> {
+    return this.authService.login(loginDto);
   }
 
   @Post('register/:token')
