@@ -6,7 +6,7 @@ import {
   IsString,
   ValidateIf,
 } from 'class-validator';
-import { Role, Gender } from '../../shared/types/types';
+import { Role } from '../../shared/types/types';
 
 export class UserRegistrationDto {
   @IsString()
