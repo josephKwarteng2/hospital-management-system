@@ -15,6 +15,7 @@ import { TokenService } from 'src/shared/services/token/token.service';
 import { mailConfig } from 'src/config/mail.config';
 import { ProfileCreatorFactory } from './profile-creators/profile-creator.factory';
 import { PasswordPolicy } from 'src/shared/validator/password-policy';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -124,6 +125,42 @@ export class AuthService {
 
     return {
       message: TOAST_MSGS.REGISTRATION_SUCCESSFUL,
+      user: this.sanitizeUser(user),
+    };
+  }
+
+  public async login(
+    loginDto: LoginDto,
+  ): Promise<{ token: string; user: Partial<User> }> {
+    const { email, password } = loginDto;
+
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    if (!user) {
+      throw new AuthenticationError(
+        TOAST_MSGS.INVALID_CREDENTIALS,
+        'INVALID_CREDENTIALS',
+      );
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      throw new AuthenticationError(
+        TOAST_MSGS.INVALID_CREDENTIALS,
+        'INVALID_CREDENTIALS',
+      );
+    }
+
+    const token = this.tokenService.generateToken({
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+    });
+
+    return {
+      token,
       user: this.sanitizeUser(user),
     };
   }
