@@ -4,8 +4,10 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { Role, Status } from '../types/types';
+import { OtpToken } from './otp-token.entity';
 
 @Entity('users')
 export class User {
@@ -35,4 +37,7 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => OtpToken, (otpToken) => otpToken.user)
+  otpTokens: OtpToken[];
 }
